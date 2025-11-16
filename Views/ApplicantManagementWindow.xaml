@@ -1,0 +1,337 @@
+<Window x:Class="GrapheneSensore.Views.ApplicantManagementWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d"
+        Title="Applicant Management - Graphene Feedback System" 
+        Height="700" Width="1200"
+        WindowStartupLocation="CenterScreen"
+        Background="#F5F5F5">
+
+    <Window.Resources>
+        <!-- Modern Button Style -->
+        <Style x:Key="ModernButtonStyle" TargetType="Button">
+            <Setter Property="Background" Value="#2196F3"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Padding" Value="20,10"/>
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border Background="{TemplateBinding Background}" 
+                                CornerRadius="5" 
+                                Padding="{TemplateBinding Padding}">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Background" Value="#1976D2"/>
+                </Trigger>
+                <Trigger Property="IsEnabled" Value="False">
+                    <Setter Property="Background" Value="#CCCCCC"/>
+                    <Setter Property="Cursor" Value="Arrow"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+
+        <!-- Danger Button Style -->
+        <Style x:Key="DangerButtonStyle" TargetType="Button" BasedOn="{StaticResource ModernButtonStyle}">
+            <Setter Property="Background" Value="#F44336"/>
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Background" Value="#D32F2F"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+
+        <!-- Success Button Style -->
+        <Style x:Key="SuccessButtonStyle" TargetType="Button" BasedOn="{StaticResource ModernButtonStyle}">
+            <Setter Property="Background" Value="#4CAF50"/>
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Background" Value="#388E3C"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+
+        <!-- Modern TextBox Style -->
+        <Style x:Key="ModernTextBoxStyle" TargetType="TextBox">
+            <Setter Property="Padding" Value="10,8"/>
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="BorderBrush" Value="#DDDDDD"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Background" Value="White"/>
+            <Style.Triggers>
+                <Trigger Property="IsFocused" Value="True">
+                    <Setter Property="BorderBrush" Value="#2196F3"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+    </Window.Resources>
+
+    <Grid>
+        <!-- Header -->
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <!-- Title Bar -->
+        <Border Grid.Row="0" Background="#1976D2" Padding="20,15">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+                
+                <StackPanel Grid.Column="0">
+                    <TextBlock Text="📋 Applicant Management" 
+                               FontSize="24" 
+                               FontWeight="Bold" 
+                               Foreground="White"/>
+                    <TextBlock Text="Manage applicants for feedback evaluation" 
+                               FontSize="14" 
+                               Foreground="#E3F2FD" 
+                               Margin="0,5,0,0"/>
+                </StackPanel>
+
+                <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
+                    <TextBlock Text="Total Applicants: " 
+                               Foreground="White" 
+                               FontSize="16" 
+                               VerticalAlignment="Center"/>
+                    <TextBlock Text="{Binding Applicants.Count}" 
+                               Foreground="White" 
+                               FontSize="20" 
+                               FontWeight="Bold" 
+                               VerticalAlignment="Center"/>
+                </StackPanel>
+            </Grid>
+        </Border>
+
+        <!-- Search and Actions Bar -->
+        <Border Grid.Row="1" Background="White" Padding="20,15" BorderBrush="#E0E0E0" BorderThickness="0,0,0,1">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+
+                <!-- Search Box -->
+                <StackPanel Grid.Column="0" Orientation="Horizontal">
+                    <TextBlock Text="🔍" FontSize="20" VerticalAlignment="Center" Margin="0,0,10,0"/>
+                    <TextBox Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}" 
+                             Width="300" 
+                             Style="{StaticResource ModernTextBoxStyle}"
+                             VerticalAlignment="Center">
+                        <TextBox.InputBindings>
+                            <KeyBinding Key="Enter" Command="{Binding RefreshCommand}"/>
+                        </TextBox.InputBindings>
+                    </TextBox>
+                    <TextBlock Text="Search by name, email, or reference..." 
+                               Foreground="#757575" 
+                               VerticalAlignment="Center" 
+                               Margin="10,0,0,0"
+                               FontStyle="Italic"/>
+                </StackPanel>
+
+                <!-- Action Buttons -->
+                <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Right">
+                    <Button Content="➕ Add Applicant" 
+                            Command="{Binding AddApplicantCommand}" 
+                            Style="{StaticResource SuccessButtonStyle}" 
+                            Margin="0,0,10,0"/>
+                    <Button Content="🔄 Refresh" 
+                            Command="{Binding RefreshCommand}" 
+                            Style="{StaticResource ModernButtonStyle}" 
+                            Margin="0,0,10,0"/>
+                    <Button Content="🗑️ Delete All" 
+                            Command="{Binding DeleteAllCommand}" 
+                            Style="{StaticResource DangerButtonStyle}"/>
+                </StackPanel>
+            </Grid>
+        </Border>
+
+        <!-- Main Content -->
+        <Grid Grid.Row="2" Margin="20">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="2*"/>
+                <ColumnDefinition Width="10"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+
+            <!-- Applicants List -->
+            <Border Grid.Column="0" Background="White" CornerRadius="8" Padding="0">
+                <Border.Effect>
+                    <DropShadowEffect BlurRadius="10" ShadowDepth="2" Opacity="0.2"/>
+                </Border.Effect>
+                
+                <Grid>
+                    <DataGrid ItemsSource="{Binding Applicants}" 
+                              SelectedItem="{Binding SelectedApplicant}"
+                              AutoGenerateColumns="False" 
+                              CanUserAddRows="False"
+                              IsReadOnly="True"
+                              GridLinesVisibility="None"
+                              HeadersVisibility="Column"
+                              Background="White"
+                              BorderThickness="0"
+                              RowHeight="50"
+                              FontSize="14"
+                              SelectionMode="Single"
+                              AlternatingRowBackground="#F9F9F9">
+                        
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Header="Name" Binding="{Binding FullName}" Width="*" FontWeight="SemiBold"/>
+                            <DataGridTextColumn Header="Email" Binding="{Binding Email}" Width="*"/>
+                            <DataGridTextColumn Header="Reference #" Binding="{Binding ReferenceNumber}" Width="150"/>
+                            <DataGridTextColumn Header="Added Date" Binding="{Binding CreatedDate, StringFormat='{}{0:MMM dd, yyyy}'}" Width="150"/>
+                        </DataGrid.Columns>
+
+                        <DataGrid.ColumnHeaderStyle>
+                            <Style TargetType="DataGridColumnHeader">
+                                <Setter Property="Background" Value="#F5F5F5"/>
+                                <Setter Property="Foreground" Value="#424242"/>
+                                <Setter Property="FontWeight" Value="Bold"/>
+                                <Setter Property="Padding" Value="15,10"/>
+                                <Setter Property="BorderThickness" Value="0,0,0,2"/>
+                                <Setter Property="BorderBrush" Value="#2196F3"/>
+                            </Style>
+                        </DataGrid.ColumnHeaderStyle>
+
+                        <DataGrid.CellStyle>
+                            <Style TargetType="DataGridCell">
+                                <Setter Property="Padding" Value="15,10"/>
+                                <Setter Property="BorderThickness" Value="0"/>
+                                <Style.Triggers>
+                                    <Trigger Property="IsSelected" Value="True">
+                                        <Setter Property="Background" Value="#E3F2FD"/>
+                                        <Setter Property="Foreground" Value="#1976D2"/>
+                                    </Trigger>
+                                </Style.Triggers>
+                            </Style>
+                        </DataGrid.CellStyle>
+                    </DataGrid>
+
+                    <!-- Loading Overlay -->
+                    <Border Background="#AA000000" Visibility="{Binding IsLoading, Converter={StaticResource BoolToVisibilityConverter}}">
+                        <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
+                            <TextBlock Text="⏳" FontSize="48" HorizontalAlignment="Center"/>
+                            <TextBlock Text="Loading applicants..." 
+                                       Foreground="White" 
+                                       FontSize="18" 
+                                       HorizontalAlignment="Center" 
+                                       Margin="0,10,0,0"/>
+                        </StackPanel>
+                    </Border>
+
+                    <!-- Empty State -->
+                    <StackPanel HorizontalAlignment="Center" 
+                                VerticalAlignment="Center" 
+                                Visibility="{Binding Applicants.Count, Converter={StaticResource ZeroToVisibilityConverter}}">
+                        <TextBlock Text="📋" FontSize="72" HorizontalAlignment="Center" Foreground="#BDBDBD"/>
+                        <TextBlock Text="No applicants yet" 
+                                   FontSize="20" 
+                                   Foreground="#757575" 
+                                   HorizontalAlignment="Center" 
+                                   Margin="0,15,0,5"/>
+                        <TextBlock Text="Click 'Add Applicant' to get started" 
+                                   FontSize="14" 
+                                   Foreground="#9E9E9E" 
+                                   HorizontalAlignment="Center"/>
+                    </StackPanel>
+                </Grid>
+            </Border>
+
+            <!-- Details Panel -->
+            <Border Grid.Column="2" Background="White" CornerRadius="8" Padding="20">
+                <Border.Effect>
+                    <DropShadowEffect BlurRadius="10" ShadowDepth="2" Opacity="0.2"/>
+                </Border.Effect>
+
+                <StackPanel>
+                    <TextBlock Text="Quick Actions" 
+                               FontSize="18" 
+                               FontWeight="Bold" 
+                               Foreground="#1976D2" 
+                               Margin="0,0,0,20"/>
+
+                    <Button Content="✏️ Edit Applicant" 
+                            Command="{Binding EditApplicantCommand}" 
+                            Style="{StaticResource ModernButtonStyle}" 
+                            Margin="0,0,0,10"
+                            HorizontalAlignment="Stretch"/>
+
+                    <Button Content="🚀 Start Feedback" 
+                            Command="{Binding StartFeedbackCommand}" 
+                            Style="{StaticResource SuccessButtonStyle}" 
+                            Margin="0,0,0,10"
+                            HorizontalAlignment="Stretch"/>
+
+                    <Button Content="🗑️ Delete" 
+                            Command="{Binding DeleteApplicantCommand}" 
+                            Style="{StaticResource DangerButtonStyle}" 
+                            HorizontalAlignment="Stretch"/>
+
+                    <Separator Margin="0,20"/>
+
+                    <!-- Selected Applicant Info -->
+                    <StackPanel Visibility="{Binding SelectedApplicant, Converter={StaticResource NullToVisibilityConverter}}">
+                        <TextBlock Text="Selected Applicant" 
+                                   FontSize="16" 
+                                   FontWeight="Bold" 
+                                   Margin="0,0,0,15"/>
+                        
+                        <TextBlock Text="{Binding SelectedApplicant.FullName}" 
+                                   FontSize="18" 
+                                   FontWeight="SemiBold" 
+                                   Foreground="#1976D2"/>
+                        
+                        <TextBlock Text="{Binding SelectedApplicant.Email}" 
+                                   FontSize="14" 
+                                   Foreground="#757575" 
+                                   Margin="0,5,0,0"/>
+                        
+                        <TextBlock FontSize="12" 
+                                   Foreground="#9E9E9E" 
+                                   Margin="0,10,0,0">
+                            <Run Text="Ref: "/>
+                            <Run Text="{Binding SelectedApplicant.ReferenceNumber}" FontWeight="Bold"/>
+                        </TextBlock>
+
+                        <TextBlock Text="{Binding SelectedApplicant.Notes}" 
+                                   TextWrapping="Wrap" 
+                                   FontSize="12" 
+                                   Foreground="#616161" 
+                                   Margin="0,10,0,0"
+                                   MaxHeight="100"/>
+                    </StackPanel>
+                </StackPanel>
+            </Border>
+        </Grid>
+
+        <!-- Status Bar -->
+        <Border Grid.Row="3" Background="#424242" Padding="15,10">
+            <Grid>
+                <TextBlock Text="Graphene Feedback System v3.0" 
+                           Foreground="White" 
+                           FontSize="12"/>
+                
+                <TextBlock Text="{Binding SelectedApplicant.FullName, StringFormat='Selected: {0}'}" 
+                           Foreground="#FFC107" 
+                           FontSize="12" 
+                           HorizontalAlignment="Right"
+                           Visibility="{Binding SelectedApplicant, Converter={StaticResource NullToVisibilityConverter}}"/>
+            </Grid>
+        </Border>
+    </Grid>
+</Window>
